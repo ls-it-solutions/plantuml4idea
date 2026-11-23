@@ -10,19 +10,12 @@
     <depends optional="true" config-file="images-puml.xml">com.intellij.platform.images</depends>
     <depends optional="true" config-file="grazie-puml.xml">tanvd.grazi</depends>
 
-    <application-components>
-        <!-- Add your application components here -->
-        <component>
-            <implementation-class>org.plantuml.idea.PlantUmlApplicationComponent</implementation-class>
-        </component>
-    </application-components>
-
-    <project-components>
-        <!-- Add your project components here -->
-        <component>
-            <implementation-class>org.plantuml.idea.PlantUmlProjectComponent</implementation-class>
-        </component>
-    </project-components>
+    <projectListeners>
+        <listener class="org.plantuml.idea.preview.listener.PlantUmlToolWindowOpener"
+                  topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
+        <listener class="org.plantuml.idea.preview.listener.PlantUmlRenderingFileEditorManagerListener"
+                  topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
+    </projectListeners>
 
     <actions>
         <group id="PlantUML.EditorLayout">
@@ -153,6 +146,8 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="PlantUML integration plugin" displayType="BALLOON" isLogByDefault="true"/>
+
+        <postStartupActivity implementation="org.plantuml.idea.PlantUmlStartupActivity"/>
 
         <intentionAction>
             <className>org.plantuml.idea.intentions.ReverseArrowIntention</className>

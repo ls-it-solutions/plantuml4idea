@@ -71,7 +71,7 @@ import java.beans.PropertyChangeListener;
  *
  * @author <a href="mailto:aefimov.box@gmail.com">Alexey Efimov</a>
  */
-public final class MyImageEditorUI extends JPanel implements DataProvider, CopyProvider, ImageComponentDecorator, Disposable {
+public final class MyImageEditorUI extends JPanel implements UiDataProvider, CopyProvider, ImageComponentDecorator, Disposable {
     private static final Logger LOG = Logger.getInstance(MyImageEditorUI.class);
 
     @NonNls public static String ACTION_PLACE = "Images.Thumbnails";
@@ -676,43 +676,20 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
 
 
     @Override
-    @Nullable
-    public Object getData(@NotNull String dataId) {
-        if (CommonDataKeys.PROJECT.is(dataId)) {
-            return editor != null ? editor.getProject() : null;
-        } else if (CommonDataKeys.VIRTUAL_FILE.is(dataId)) {
-            return editor != null ? editor.getFile() : null;
-        } else if (CommonDataKeys.VIRTUAL_FILE_ARRAY.is(dataId)) {
-            return editor != null ? new VirtualFile[]{editor.getFile()} : VirtualFile.EMPTY_ARRAY;
-        }
-//    else if (PlatformDataKeys.COPY_PROVIDER.is(dataId)) {
-//      return this;
-//    }
-//    else if (PlatformDataKeys.CUT_PROVIDER.is(dataId) && copyPasteSupport != null) {
-//      return copyPasteSupport.getCutProvider();
-//    }
-//    else if (PlatformDataKeys.DELETE_ELEMENT_PROVIDER.is(dataId)) {
-//      return deleteProvider;
-//    }
-        else if (ImageComponentDecorator.DATA_KEY.is(dataId)) {
-            return editor != null ? editor : this;
-        } else if (PlatformCoreDataKeys.BGT_DATA_PROVIDER.is(dataId)) {
-            return (DataProvider) slowId -> getSlowData(slowId);
-        }
-        return null;
-    }
+    public void uiDataSnapshot(@NotNull DataSink sink) {
+        sink.set(CommonDataKeys.PROJECT, editor != null ? editor.getProject() : null);
+        sink.set(CommonDataKeys.VIRTUAL_FILE, editor != null ? editor.getFile() : null);
+        sink.set(CommonDataKeys.VIRTUAL_FILE_ARRAY,
+                editor != null ? new VirtualFile[]{editor.getFile()} : VirtualFile.EMPTY_ARRAY);
+        sink.set(ImageComponentDecorator.DATA_KEY, editor != null ? editor : this);
 
-    private @Nullable Object getSlowData(@NotNull String dataId) {
-        if (CommonDataKeys.PSI_FILE.is(dataId)) {
-            return findPsiFile();
-        } else if (CommonDataKeys.PSI_ELEMENT.is(dataId)) {
-            return findPsiFile();
-        } else if (PlatformCoreDataKeys.PSI_ELEMENT_ARRAY.is(dataId)) {
+        // slow data: evaluated lazily on a background thread
+        sink.lazy(CommonDataKeys.PSI_FILE, this::findPsiFile);
+        sink.lazy(CommonDataKeys.PSI_ELEMENT, this::findPsiFile);
+        sink.lazy(PlatformCoreDataKeys.PSI_ELEMENT_ARRAY, () -> {
             PsiElement psi = findPsiFile();
             return psi != null ? new PsiElement[]{psi} : PsiElement.EMPTY_ARRAY;
-        }
-
-        return null;
+        });
     }
 
     @Nullable

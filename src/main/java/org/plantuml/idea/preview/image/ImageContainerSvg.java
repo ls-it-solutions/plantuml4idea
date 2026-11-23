@@ -283,12 +283,8 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
     }
 
     @Override
-    public @Nullable
-    Object getData(@NotNull @NonNls String s) {
-        if (CONTEXT_COMPONENT.is(s)) {
-            return this;
-        }
-        return null;
+    public void uiDataSnapshot(@NotNull DataSink sink) {
+        sink.set(CONTEXT_COMPONENT, this);
     }
 
     @Override

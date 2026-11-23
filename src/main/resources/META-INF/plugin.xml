@@ -164,7 +164,12 @@
 
         <toolWindow id="PlantUML" icon="/images/uml.svg" anchor="right"
                     factoryClass="org.plantuml.idea.preview.toolwindow.PlantUmlToolWindowFactory"/>
-        <fileTypeFactory implementation="org.plantuml.idea.lang.PlantUmlTypeFactory"/>
+        <fileType name="PlantUML file" language="PUML"
+                  implementationClass="org.plantuml.idea.lang.PlantUmlFileType" fieldName="INSTANCE"
+                  extensions="puml;plantuml"/>
+        <fileType name="PlantUML include file" language="PUML"
+                  implementationClass="org.plantuml.idea.lang.PlantIUmlFileType" fieldName="INSTANCE"
+                  extensions="iuml"/>
         <lang.parserDefinition language="PUML"
                                implementationClass="org.plantuml.idea.lang.PlantUmlParserDefinition"/>
         <lang.commenter language="PUML" implementationClass="org.plantuml.idea.lang.PlantUmlCommenter"/>
